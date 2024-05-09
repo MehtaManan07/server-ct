@@ -1,6 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-
+console.log(`${__dirname}/../**/**.entity{.ts}`);
 @Global()
 @Module({
   imports: [],
@@ -20,7 +20,7 @@ import { DataSource } from 'typeorm';
             database: process.env.DB_NAME,
             synchronize: false,
             logging: true,
-            entities: [`${__dirname}/../**/**.entity{.ts,.js}`], // this will automatically load all entity file in the src folder
+            entities: [`${__dirname}/../**/**.entity{.ts}`], // this will automatically load all entity file in the src folder
           });
           await dataSource.initialize(); // initialize the data source
           console.log('Database connected successfully');
