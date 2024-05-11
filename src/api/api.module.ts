@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RawMaterial } from './raw-materials/entities/raw-material.entity';
 import { Supplier } from './suppliers/entities/supplier.entity';
 import { ConfigService } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 console.log(process.env.PG_HOST);
 @Module({
   imports: [
@@ -24,8 +26,11 @@ console.log(process.env.PG_HOST);
       }),
     }),
 
+    AuthModule,
+    UsersModule,
     RawMaterialsModule,
     SuppliersModule,
   ],
+  exports: [AuthModule, UsersModule],
 })
 export class ApiModule {}
