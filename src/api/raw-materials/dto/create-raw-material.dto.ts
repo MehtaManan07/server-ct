@@ -25,7 +25,7 @@ export class CreateRawMaterialDto {
   @IsNotEmpty()
   category: string;
 
-  //   @IsNumber()
-  //   @IsNotEmpty()
-  //   supplierId: number;
+  @IsString()
+  @IsNotEmpty()
+  supplier: string;
 }

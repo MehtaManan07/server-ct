@@ -1,9 +1,7 @@
-import { Supplier } from 'src/api/suppliers/entities/supplier.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -41,8 +39,5 @@ export class RawMaterial {
   description: string;
 
   @Column({ nullable: true })
-  supplierId: number;
-
-  @ManyToOne(() => Supplier, (supplier) => supplier.rawMaterials)
-  supplier: Supplier;
+  supplier: string;
 }
