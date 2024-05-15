@@ -1,7 +1,7 @@
 service: crafto-pg
 
 plugins:
-  # - serverless-jetpack 
+  # - serverless-jetpack
   # - serverless-plugin-typescript
   # - serverless-plugin-optimize
   # - serverless-offline

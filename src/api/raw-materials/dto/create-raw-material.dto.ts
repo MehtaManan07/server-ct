@@ -29,3 +29,8 @@ export class CreateRawMaterialDto {
   @IsNotEmpty()
   supplier: string;
 }
+
+export class CreateRawMaterialBulkDto {
+  @IsNotEmpty()
+  data: CreateRawMaterialDto[];
+}

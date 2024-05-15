@@ -5,21 +5,18 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
   Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { LoggerService } from 'src/common/logger';
-import { JwtAuthGuard, RolesGuard } from '../auth/guard';
-import { Roles } from '../auth/decorators';
 import { Role } from './entities/user.entity';
 
 @Controller('users')
 @ApiTags('users')
-@ApiBearerAuth('access-token')
-@UseGuards(JwtAuthGuard)
+// @ApiBearerAuth('access-token')
+// @UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
@@ -28,11 +25,16 @@ export class UsersController {
     this.logger.setContext(UsersController.name);
   }
 
-  @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
+  // @UseGuards(RolesGuard)
+  // @Roles(Role.ADMIN)
   @Get()
   findAll() {
     return this.usersService.findAll();
+  }
+
+  @Get('role/:role')
+  findByRole(@Param('role') role: Role) {
+    return this.usersService.findByRole(role);
   }
 
   @Get('me')

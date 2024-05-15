@@ -21,6 +21,15 @@ export class RawMaterialsService {
     return;
   }
 
+  async createBulk(createRawMaterialDto: CreateRawMaterialDto[]) {
+    const result = await this.rawMaterialRepository
+      .createQueryBuilder()
+      .insert()
+      .values(createRawMaterialDto)
+      .execute();
+    return result;
+  }
+
   async findAll(name: string): Promise<RawMaterial[]> {
     const materials = await this.rawMaterialRepository.find({
       where: [
@@ -65,8 +74,6 @@ export class RawMaterialsService {
       .createQueryBuilder('rawMaterial')
       .select('DISTINCT(rawMaterial.category)')
       .getRawMany();
-
-    console.log(categories);
 
     const uniqueCategories = categories.map((item) => item.category);
     return uniqueCategories;

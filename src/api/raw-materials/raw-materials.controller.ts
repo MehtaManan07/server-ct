@@ -9,7 +9,10 @@ import {
   Query,
 } from '@nestjs/common';
 import { RawMaterialsService } from './raw-materials.service';
-import { CreateRawMaterialDto } from './dto/create-raw-material.dto';
+import {
+  CreateRawMaterialBulkDto,
+  CreateRawMaterialDto,
+} from './dto/create-raw-material.dto';
 import { UpdateRawMaterialDto } from './dto/update-raw-material.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 
@@ -23,10 +26,15 @@ export class RawMaterialsController {
     return this.rawMaterialsService.create(createRawMaterialDto);
   }
 
+  @Post('/bulk')
+  createBulk(@Body() createRawMaterialDto: CreateRawMaterialBulkDto) {
+    return this.rawMaterialsService.createBulk(createRawMaterialDto.data);
+  }
+
   @Get()
   @ApiQuery({ name: 'name', type: String })
   findAll(@Query() params: { name: string }) {
-    return this.rawMaterialsService.findAll(params.name);
+    return this.rawMaterialsService.findAll(params.name ?? '');
   }
 
   @Get(':id')
