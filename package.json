@@ -18,7 +18,11 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "build:deploy": "npm run build && serverless deploy"
+    "build:deploy": "npm run build && serverless deploy",
+    "typeorm": "npm run build && npx typeorm -d dist/db/datasource.js",
+    "migration:generate": "npm run typeorm -- migration:generate",
+    "migration:run": "npm run typeorm -- migration:run",
+    "migration:revert": "npm run typeorm -- migration:revert"
   },
   "dependencies": {
     "@codegenie/serverless-express": "^4.14.1",

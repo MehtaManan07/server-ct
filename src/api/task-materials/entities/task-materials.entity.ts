@@ -1,6 +1,13 @@
 import { RawMaterial } from 'src/api/raw-materials/entities/raw-material.entity';
 import { Task } from 'src/api/tasks/entities/task.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class TaskToMaterial {
@@ -21,4 +28,10 @@ export class TaskToMaterial {
 
   @ManyToOne(() => Task, (task) => task.taskToMaterials)
   public task: Task;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedDate: Date;
 }
