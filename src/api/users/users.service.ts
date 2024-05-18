@@ -35,6 +35,18 @@ export class UsersService {
     return userDoc;
   }
 
+  async findAssignedTasks(id: number) {
+    const userDoc = await this.userRepository.findOne({
+      where: { id, isDeleted: false },
+
+      // relations: {
+      //   ta
+      // },
+    });
+    if (!userDoc) throw new NotFoundException('User not found by id: ' + id);
+    return userDoc;
+  }
+
   async findMe(id: number): Promise<User> {
     const userDoc = await this.userRepository.findOne({
       where: { id },

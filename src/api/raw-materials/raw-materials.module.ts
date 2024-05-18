@@ -8,5 +8,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [TypeOrmModule.forFeature([RawMaterial])],
   controllers: [RawMaterialsController],
   providers: [RawMaterialsService],
+  exports: [RawMaterialsService],
 })
 export class RawMaterialsModule {}

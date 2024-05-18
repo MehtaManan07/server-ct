@@ -1,7 +1,9 @@
+import { TaskToMaterial } from 'src/api/task-materials/entities/task-materials.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -40,4 +42,7 @@ export class RawMaterial {
 
   @Column({ nullable: true })
   supplier: string;
+
+  @OneToMany(() => TaskToMaterial, (tasks) => tasks.rawMaterial)
+  public taskToMaterials: TaskToMaterial[];
 }

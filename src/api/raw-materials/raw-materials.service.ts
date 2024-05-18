@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRawMaterialDto } from './dto/create-raw-material.dto';
 import { UpdateRawMaterialDto } from './dto/update-raw-material.dto';
 import { LoggerService } from 'src/common/logger';
 import { RawMaterial } from './entities/raw-material.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { EntityManager, Like, Repository } from 'typeorm';
 
 @Injectable()
 export class RawMaterialsService {
@@ -17,7 +17,10 @@ export class RawMaterialsService {
   }
 
   async create(createRawMaterialDto: CreateRawMaterialDto): Promise<void> {
-    await this.rawMaterialRepository.save(createRawMaterialDto);
+    await this.rawMaterialRepository.save({
+      ...createRawMaterialDto,
+      isDeleted: false,
+    });
     return;
   }
 
@@ -64,6 +67,20 @@ export class RawMaterialsService {
     return;
   }
 
+  async updateMaterialsQuantities(
+    entityManager: EntityManager,
+    rawMaterials: { materialId: number; quantityUsed: number }[],
+  ) {
+    for (const { materialId, quantityUsed } of rawMaterials) {
+      await entityManager.decrement(
+        'RawMaterial',
+        { id: materialId },
+        'quantity',
+        quantityUsed,
+      );
+    }
+  }
+
   async hardRemove(id: number) {
     await this.rawMaterialRepository.delete(id);
     return;
@@ -83,5 +100,21 @@ export class RawMaterialsService {
       where: { category: Like(`%${category}%`) },
     });
     return materials;
+  }
+
+  async checkMaterialsAvailability(
+    rawMaterials: { materialId: number; quantityUsed: number }[],
+  ) {
+    // Check if all raw materials are available
+    for (const { materialId, quantityUsed } of rawMaterials) {
+      const material = await this.rawMaterialRepository.findOne({
+        where: { id: materialId },
+      });
+      if (!material || material.quantity < quantityUsed) {
+        throw new NotFoundException(
+          `Material with ID ${materialId} is not available in sufficient quantity.`,
+        );
+      }
+    }
   }
 }
