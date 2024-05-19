@@ -1,11 +1,5 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  BaseEntity,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { BaseEntity } from 'src/db/base.entity';
+import { Entity, Column } from 'typeorm';
 
 export enum Role {
   ADMIN = 'ADMIN',
@@ -15,18 +9,6 @@ export enum Role {
 
 @Entity()
 export class User extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @Column({ type: 'boolean', default: false })
-  isDeleted: boolean;
-
   @Column({ unique: true })
   username: string;
 

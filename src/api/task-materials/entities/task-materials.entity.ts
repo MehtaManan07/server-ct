@@ -1,19 +1,10 @@
 import { RawMaterial } from 'src/api/raw-materials/entities/raw-material.entity';
 import { Task } from 'src/api/tasks/entities/task.entity';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { BaseEntity } from 'src/db/base.entity';
+import { Column, Entity, ManyToOne } from 'typeorm';
 
 @Entity()
-export class TaskToMaterial {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class TaskToMaterial extends BaseEntity {
   @Column()
   public rawMaterialId: number;
 
@@ -28,10 +19,4 @@ export class TaskToMaterial {
 
   @ManyToOne(() => Task, (task) => task.taskToMaterials)
   public task: Task;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedDate: Date;
 }

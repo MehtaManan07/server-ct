@@ -1,47 +1,41 @@
 import { TaskToMaterial } from 'src/api/task-materials/entities/task-materials.entity';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { BaseEntity } from 'src/db/base.entity';
+import { Column, Entity, OneToMany } from 'typeorm';
 
+// CREATE TABLE Stones (
+//   StoneID SERIAL PRIMARY KEY,
+//   StoneName VARCHAR(255) NOT NULL,
+//   SizeMM INT NOT NULL,
+//   Color VARCHAR(50) NOT NULL,
+//   PacketsAvailable INT NOT NULL,
+//   TotalGramsAvailable INT NOT NULL,
+//   PacketWeightGrams INT NOT NULL
+// );
 @Entity()
-export class RawMaterial {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @Column({ default: false })
-  isDeleted: boolean;
-
-  @Column({ unique: true })
+export class RawMaterial extends BaseEntity {
+  @Column({ type: 'varchar', length: 255, nullable: false })
   name: string;
 
-  @Column({ nullable: true })
-  quantity: number;
+  // @Column({ unique: true })
+  // name: string;
 
-  @Column()
-  size: string;
+  // @Column({ nullable: true })
+  // quantity: number;
 
-  @Column()
-  pricePerUnit: number;
+  // @Column()
+  // size: string;
 
-  @Column()
-  category: string;
+  // @Column()
+  // pricePerUnit: number;
 
-  @Column({ nullable: true })
-  description: string;
+  // @Column()
+  // category: string;
 
-  @Column({ nullable: true })
-  supplier: string;
+  // @Column({ nullable: true })
+  // description: string;
+
+  // @Column({ nullable: true })
+  // supplier: string;
 
   @OneToMany(() => TaskToMaterial, (tasks) => tasks.rawMaterial)
   public taskToMaterials: TaskToMaterial[];
