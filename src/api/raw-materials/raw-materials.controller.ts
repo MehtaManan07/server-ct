@@ -62,7 +62,7 @@ export class RawMaterialsController {
 
   @Get('/category/all')
   fetchCategoryNames() {
-    return this.rawMaterialsService.fetchCategoryNames();
+    return this.rawMaterialsService.fetchCategoryCounts();
   }
 
   @Get('/category/search')

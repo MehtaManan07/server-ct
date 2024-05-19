@@ -4,7 +4,13 @@ import { UpdateRawMaterialDto } from './dto/update-raw-material.dto';
 import { LoggerService } from 'src/common/logger';
 import { RawMaterial } from './entities/raw-material.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Like, Repository } from 'typeorm';
+import {
+  ArrayContains,
+  EntityManager,
+  Like,
+  ObjectLiteral,
+  Repository,
+} from 'typeorm';
 
 @Injectable()
 export class RawMaterialsService {
@@ -17,28 +23,37 @@ export class RawMaterialsService {
   }
 
   async create(createRawMaterialDto: CreateRawMaterialDto): Promise<void> {
+    const { categories, name, packetsAvailable, size, unit, weightPerUnit } =
+      createRawMaterialDto;
+    const totalWeight = packetsAvailable * weightPerUnit;
     await this.rawMaterialRepository.save({
-      ...createRawMaterialDto,
-      isDeleted: false,
+      totalWeight,
+      categories,
+      name,
+      size,
+      unit,
+      packetsAvailable,
+      weightPerUnit,
     });
     return;
   }
 
-  async createBulk(createRawMaterialDto: CreateRawMaterialDto[]) {
+  async createBulk(
+    createRawMaterialDto: CreateRawMaterialDto[],
+  ): Promise<ObjectLiteral[]> {
     const result = await this.rawMaterialRepository
       .createQueryBuilder()
       .insert()
       .values(createRawMaterialDto)
       .execute();
-    return result;
+    return result.identifiers;
   }
 
   async findAll(name: string): Promise<RawMaterial[]> {
     const materials = await this.rawMaterialRepository.find({
       where: [
         { name: Like(`%${name}%`) },
-        { description: Like(`%${name}%`) },
-        { category: Like(`%${name}%`) },
+        { categories: ArrayContains([name]) },
       ],
     });
     return materials;
@@ -85,19 +100,27 @@ export class RawMaterialsService {
     await this.rawMaterialRepository.delete(id);
     return;
   }
-
-  async fetchCategoryNames(): Promise<string[]> {
-    const categories = await this.rawMaterialRepository
+  async fetchCategoryCounts(): Promise<
+    { category: string; count: number; names: string[] }[]
+  > {
+    const categoryCounts = await this.rawMaterialRepository
       .createQueryBuilder('rawMaterial')
-      .select('DISTINCT(rawMaterial.category)')
+      .select('unnest(rawMaterial.categories)', 'category')
+      .addSelect('COUNT(*)', 'count')
+      .addSelect('array_agg(rawMaterial.name)', 'names')
+      .groupBy('category')
       .getRawMany();
 
-    const uniqueCategories = categories.map((item) => item.category);
-    return uniqueCategories;
+    return categoryCounts.map((item) => ({
+      category: item.category,
+      count: parseInt(item.count, 10),
+      names: item.names,
+    }));
   }
+
   async findByCategory(category: string): Promise<RawMaterial[]> {
     const materials = await this.rawMaterialRepository.find({
-      where: { category: Like(`%${category}%`) },
+      where: { categories: ArrayContains([category]) },
     });
     return materials;
   }
@@ -110,7 +133,7 @@ export class RawMaterialsService {
       const material = await this.rawMaterialRepository.findOne({
         where: { id: materialId },
       });
-      if (!material || material.quantity < quantityUsed) {
+      if (!material || material.totalWeight < quantityUsed) {
         throw new NotFoundException(
           `Material with ID ${materialId} is not available in sufficient quantity.`,
         );

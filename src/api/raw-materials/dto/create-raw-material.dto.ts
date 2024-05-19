@@ -1,33 +1,32 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateRawMaterialDto {
   @IsString()
   @IsNotEmpty()
-  description: string;
-
-  @IsString()
-  @IsNotEmpty()
   name: string;
 
+  @IsNumber()
+  @IsNotEmpty()
+  size: number;
+
+  @IsArray({ always: true })
+  @IsNotEmpty()
+  categories: string[];
+
   @IsString()
   @IsNotEmpty()
-  size: string;
+  unit: string;
 
   @IsNumber()
   @IsNotEmpty()
-  pricePerUnit: number;
+  packetsAvailable: number;
 
   @IsNumber()
   @IsNotEmpty()
-  quantity: number;
+  weightPerUnit: number;
 
-  @IsString()
-  @IsNotEmpty()
-  category: string;
-
-  @IsString()
-  @IsNotEmpty()
-  supplier: string;
+  @IsNumber()
+  totalWeight?: number;
 }
 
 export class CreateRawMaterialBulkDto {
