@@ -18,7 +18,7 @@ export const dbConfig: TypeOrmModuleOptions = {
 
   migrations: ['dist/db/migrations/*.js'],
   // ssl: true,
-  autoLoadEntities: true,
+  // autoLoadEntities: true,
 };
 
 export default registerAs('db', () => dbConfig);
