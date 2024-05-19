@@ -16,26 +16,23 @@ export class RawMaterial extends BaseEntity {
   @Column({ type: 'varchar', length: 255, nullable: false })
   name: string;
 
-  // @Column({ unique: true })
-  // name: string;
+  @Column({ nullable: true })
+  quantity: number;
 
-  // @Column({ nullable: true })
-  // quantity: number;
+  @Column()
+  size: string;
 
-  // @Column()
-  // size: string;
+  @Column()
+  pricePerUnit: number;
 
-  // @Column()
-  // pricePerUnit: number;
+  @Column()
+  category: string;
 
-  // @Column()
-  // category: string;
+  @Column({ nullable: true })
+  description: string;
 
-  // @Column({ nullable: true })
-  // description: string;
-
-  // @Column({ nullable: true })
-  // supplier: string;
+  @Column({ nullable: true })
+  supplier: string;
 
   @OneToMany(() => TaskToMaterial, (tasks) => tasks.rawMaterial)
   public taskToMaterials: TaskToMaterial[];
