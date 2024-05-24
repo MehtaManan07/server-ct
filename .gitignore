@@ -14,7 +14,7 @@ lerna-debug.log*
 .build/
 # OS
 .DS_Store
-.env
+.env.*
 .serverless/
 # Tests
 /coverage
