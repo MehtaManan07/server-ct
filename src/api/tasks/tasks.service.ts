@@ -34,7 +34,6 @@ export class TasksService {
         status: createTaskDto.status,
       };
       const res = await entityManager.save(Task, dataToSaveInWorkOrder);
-      console.log('res', res);
       await this.taskMaterialsService.createBulk(
         entityManager,
         createTaskDto.rawMaterialQuantities,

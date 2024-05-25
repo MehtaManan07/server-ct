@@ -9,7 +9,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import config from './common/config/env/config';
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [config, dbConfig] }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [config, dbConfig],
+      envFilePath: ['./.env.production'],
+    }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) =>

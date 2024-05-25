@@ -6,7 +6,7 @@ import { RawMaterial } from 'src/api/raw-materials/entities/raw-material.entity'
 import { Task } from 'src/api/tasks/entities/task.entity';
 import { TaskToMaterial } from 'src/api/task-materials/entities/task-materials.entity';
 
-dotenvConfig({ path: '.env' });
+dotenvConfig({ path: '.env.production' });
 
 export const dbConfig: TypeOrmModuleOptions = {
   type: 'postgres',
@@ -15,6 +15,7 @@ export const dbConfig: TypeOrmModuleOptions = {
   password: `${process.env.PG_PASSWORD}`,
   database: `${process.env.PG_DATABASE}`,
   entities: [RawMaterial, User, Task, TaskToMaterial],
+  ssl: true,
 
   migrations: ['dist/db/migrations/*.js'],
   // ssl: true,
