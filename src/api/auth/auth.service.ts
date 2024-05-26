@@ -25,6 +25,7 @@ export class AuthService {
     // Step 1: Fetch a user with the given username
     const user = await this.userRepository.findOne({
       where: { username, isDeleted: false },
+      select: ['password'],
     });
 
     // If no user is found, throw an error
@@ -42,7 +43,7 @@ export class AuthService {
 
     // Step 3: Generate a JWT containing the user's ID and return it
     return {
-      accessToken: this.jwtService.sign({ userId: user.id, role: user.role }),
+      accessToken: this.jwtService.sign({ userId: 'sasa', role: 'asdsdsa' }),
     };
   }
 
