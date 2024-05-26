@@ -43,7 +43,7 @@ export class ErrorHandler implements ExceptionFilter {
       // Log the internal server errors
       console.error(exception);
     }
-    this.logger.error(JSON.stringify(errorResponse));
+    this.logger.error(errorResponse);
 
     response.status(status).json(errorResponse);
   }
