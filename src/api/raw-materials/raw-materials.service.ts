@@ -50,10 +50,11 @@ export class RawMaterialsService {
   }
 
   async findAll(name: string): Promise<RawMaterial[]> {
+    const queryName = name.toLocaleLowerCase();
     const materials = await this.rawMaterialRepository.find({
       where: [
-        { name: Like(`%${name}%`) },
-        { categories: ArrayContains([name]) },
+        { name: Like(`%${queryName}%`) },
+        { categories: ArrayContains([queryName]) },
       ],
     });
     return materials;
