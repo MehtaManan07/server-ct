@@ -69,6 +69,7 @@ export class RawMaterialsService {
   async createBulk(
     createRawMaterialDto: CreateRawMaterialDto[],
   ): Promise<ObjectLiteral[]> {
+    const t1 = performance.now();
     const data = await Promise.all(
       createRawMaterialDto.map(async (item) => {
         const {
@@ -111,6 +112,9 @@ export class RawMaterialsService {
       .insert()
       .values(data)
       .execute();
+
+    const t2 = performance.now();
+    this.logger.log(`Bulk insert took ${t2 - t1} milliseconds.`);
     return result.identifiers;
   }
 
