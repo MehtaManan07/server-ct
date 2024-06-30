@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRawMaterialDto } from './dto/create-raw-material.dto';
-import { UpdateRawMaterialDto } from './dto/update-raw-material.dto';
 import { LoggerService } from 'src/common/logger';
 import { RawMaterial } from './entities/raw-material.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,29 +10,58 @@ import {
   ObjectLiteral,
   Repository,
 } from 'typeorm';
+import { Category } from './types';
+import { Category as CategoryEntity } from './entities/category.entity';
 
 @Injectable()
 export class RawMaterialsService {
   constructor(
     private logger: LoggerService,
+    @InjectRepository(CategoryEntity)
+    private readonly categoryRepository: Repository<CategoryEntity>,
     @InjectRepository(RawMaterial)
     private readonly rawMaterialRepository: Repository<RawMaterial>,
   ) {
     this.logger.setContext(RawMaterialsService.name);
   }
 
+  async createParentCategory(name: string): Promise<void> {
+    await this.categoryRepository.save({ name });
+    return;
+  }
+
   async create(createRawMaterialDto: CreateRawMaterialDto): Promise<void> {
-    const { categories, name, packetsAvailable, size, unit, weightPerUnit } =
-      createRawMaterialDto;
-    const totalWeight = packetsAvailable * weightPerUnit;
+    const {
+      categories,
+      name,
+      packetsAvailable,
+      size,
+      unit,
+      weightPerUnit,
+      color,
+      parentCategory: _parentCategory,
+      totalWeight: _totalWeight,
+    } = createRawMaterialDto;
+    let totalWeight = _totalWeight;
+    if (!totalWeight) {
+      totalWeight = packetsAvailable * weightPerUnit;
+    }
+    const category = await this.categoryRepository.findOne({
+      where: { name: _parentCategory },
+    });
+
+    const slug = `${name}-${size}`;
     await this.rawMaterialRepository.save({
       totalWeight,
+      color,
+      slug,
       categories,
       name,
       size,
       unit,
       packetsAvailable,
       weightPerUnit,
+      parentCategory: category,
     });
     return;
   }
@@ -41,10 +69,47 @@ export class RawMaterialsService {
   async createBulk(
     createRawMaterialDto: CreateRawMaterialDto[],
   ): Promise<ObjectLiteral[]> {
+    const data = await Promise.all(
+      createRawMaterialDto.map(async (item) => {
+        const {
+          categories,
+          name,
+          packetsAvailable,
+          size,
+          unit,
+          weightPerUnit,
+          color,
+          parentCategory,
+          totalWeight: _totalWeight,
+        } = item;
+        let totalWeight = _totalWeight;
+        if (!totalWeight) {
+          totalWeight = packetsAvailable * weightPerUnit;
+        }
+
+        const category = await this.categoryRepository.findOne({
+          where: { name: parentCategory },
+        });
+
+        const slug = `${name.split(' ').join('-')}-${size}`;
+        return {
+          totalWeight,
+          color,
+          slug,
+          categories,
+          name,
+          size,
+          unit,
+          packetsAvailable,
+          weightPerUnit,
+          parentCategory: category,
+        };
+      }),
+    );
     const result = await this.rawMaterialRepository
       .createQueryBuilder()
       .insert()
-      .values(createRawMaterialDto)
+      .values(data)
       .execute();
     return result.identifiers;
   }
@@ -60,22 +125,21 @@ export class RawMaterialsService {
     return materials;
   }
 
+  async findAllCategories(name: string): Promise<CategoryEntity[]> {
+    const queryName = name.toLocaleLowerCase();
+    const categories = await this.categoryRepository
+      .createQueryBuilder('category')
+      .leftJoinAndSelect('category.rawMaterials', 'rawMaterials')
+      .where('LOWER(category.name) LIKE :name', { name: `%${queryName}%` })
+      .getMany();
+    return categories;
+  }
+
   async findOne(id: number): Promise<RawMaterial> {
     const material = await this.rawMaterialRepository.findOne({
       where: { id },
     });
     return material;
-  }
-
-  async update(
-    id: number,
-    updateRawMaterialDto: UpdateRawMaterialDto,
-  ): Promise<RawMaterial> {
-    const material = await this.rawMaterialRepository.update(
-      id,
-      updateRawMaterialDto,
-    );
-    return material.raw[0];
   }
 
   async remove(id: number) {
@@ -101,22 +165,25 @@ export class RawMaterialsService {
     await this.rawMaterialRepository.delete(id);
     return;
   }
-  async fetchCategoryCounts(): Promise<
-    { category: string; count: number; names: string[] }[]
-  > {
-    const categoryCounts = await this.rawMaterialRepository
-      .createQueryBuilder('rawMaterial')
-      .select('unnest(rawMaterial.categories)', 'category')
-      .addSelect('COUNT(*)', 'count')
-      .addSelect('array_agg(rawMaterial.name)', 'names')
-      .groupBy('category')
-      .getRawMany();
 
-    return categoryCounts.map((item) => ({
-      category: item.category,
-      count: parseInt(item.count, 10),
-      names: item.names,
-    }));
+  async fetchCategories() {
+    const query = `
+    SELECT categories, json_agg(json_build_object(
+      'materialId', id,
+      'name', name, 
+      'packetsAvailable', "packetsAvailable", 
+      'unit', unit, 
+      'slug', slug, 
+      'color', color, 
+      'size', size, 
+      'weightPerUnit', "weightPerUnit", 
+      'totalWeight', "totalWeight"
+    )) AS materials
+    FROM raw_material
+    GROUP BY categories;
+  `;
+    const result: Category[] = await this.rawMaterialRepository.query(query);
+    return result.filter((item) => item.categories.length > 1);
   }
 
   async findByCategory(category: string): Promise<RawMaterial[]> {

@@ -1,25 +1,31 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
   Query,
 } from '@nestjs/common';
-import { RawMaterialsService } from './raw-materials.service';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
+
+import { CreateCategoryDto } from './dto/create-category.dto';
 import {
   CreateRawMaterialBulkDto,
   CreateRawMaterialDto,
 } from './dto/create-raw-material.dto';
-import { UpdateRawMaterialDto } from './dto/update-raw-material.dto';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+
+import { RawMaterialsService } from './raw-materials.service';
 
 @Controller('raw-materials')
 @ApiTags('Raw materials')
 export class RawMaterialsController {
   constructor(private readonly rawMaterialsService: RawMaterialsService) {}
+
+  @Post('/category')
+  createParentCategory(@Body() body: CreateCategoryDto) {
+    return this.rawMaterialsService.createParentCategory(body.name);
+  }
 
   @Post()
   create(@Body() createRawMaterialDto: CreateRawMaterialDto) {
@@ -37,17 +43,15 @@ export class RawMaterialsController {
     return this.rawMaterialsService.findAll(params.name ?? '');
   }
 
+  @Get('/category')
+  @ApiQuery({ name: 'name', type: String, allowEmptyValue: true })
+  findAllCategories(@Query() params: { name: string }) {
+    return this.rawMaterialsService.findAllCategories(params.name ?? '');
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.rawMaterialsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateRawMaterialDto: UpdateRawMaterialDto,
-  ) {
-    return this.rawMaterialsService.update(+id, updateRawMaterialDto);
   }
 
   @Delete(':id')
@@ -62,7 +66,7 @@ export class RawMaterialsController {
 
   @Get('/category/all')
   fetchCategoryNames() {
-    return this.rawMaterialsService.fetchCategoryCounts();
+    return this.rawMaterialsService.fetchCategories();
   }
 
   @Get('/category/search')

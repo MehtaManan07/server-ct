@@ -12,7 +12,7 @@ import config from './common/config/env/config';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [config, dbConfig],
-      envFilePath: ['./.env.production'],
+      envFilePath: ['./.env.development'],
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],

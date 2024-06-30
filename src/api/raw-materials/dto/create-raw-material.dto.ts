@@ -15,6 +15,10 @@ export class CreateRawMaterialDto {
 
   @IsString()
   @IsNotEmpty()
+  color: string;
+
+  @IsString()
+  @IsNotEmpty()
   unit: string;
 
   @IsNumber()
@@ -24,6 +28,10 @@ export class CreateRawMaterialDto {
   @IsNumber()
   @IsNotEmpty()
   weightPerUnit: number;
+
+  @IsString()
+  @IsNotEmpty()
+  parentCategory: string;
 
   @IsNumber()
   totalWeight?: number;
