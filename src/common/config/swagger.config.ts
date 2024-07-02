@@ -8,7 +8,6 @@ const setupSwagger = (app: INestApplication) => {
     .setTitle('Api docs')
     .setDescription('The API description')
     .setVersion('0.1')
-    .addTag('api')
     .build();
   const theme = new SwaggerTheme();
   const options = {
