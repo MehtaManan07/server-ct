@@ -26,9 +26,7 @@ export const dbConfig: TypeOrmModuleOptions = {
   ssl: {
     rejectUnauthorized: true,
     requestCert: true,
-    ca: fs
-      .readFileSync('/Users/motabhai/code/nest/crafto-pg/bundle.pem')
-      .toString(),
+    ca: fs.readFileSync('bundle.pem').toString(),
   },
 
   // synchronize: true,
