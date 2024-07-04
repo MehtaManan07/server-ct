@@ -26,6 +26,10 @@ export class CreateTaskDto {
   @IsNotEmpty()
   status: string;
 
+  @IsString()
+  @IsNotEmpty()
+  type: string;
+
   @IsNotEmpty()
   @IsNumber()
   jobberId: number;

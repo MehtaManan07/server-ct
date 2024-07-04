@@ -28,10 +28,14 @@ export class TasksService {
     );
     await this.entityManager.transaction(async (entityManager) => {
       // 2. create work order entry
-      const dataToSaveInWorkOrder = {
+      const dataToSaveInWorkOrder: Omit<
+        CreateTaskDto,
+        'rawMaterialQuantities'
+      > = {
         description: createTaskDto.description,
         jobberId: createTaskDto.jobberId,
         status: createTaskDto.status,
+        type: createTaskDto.type,
       };
       const res = await entityManager.save(Task, dataToSaveInWorkOrder);
       await this.taskMaterialsService.createBulk(
