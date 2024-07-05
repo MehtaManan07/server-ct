@@ -1,3 +1,4 @@
+import { ReadyProduct } from 'src/api/ready-products/entities/ready-product.entity';
 import { TaskToMaterial } from 'src/api/task-materials/entities/task-materials.entity';
 import { User } from 'src/api/users/entities/user.entity';
 import { BaseEntity } from 'src/db/base.entity';
@@ -17,4 +18,7 @@ export class Task extends BaseEntity {
 
   @OneToMany(() => TaskToMaterial, (taskToMaterial) => taskToMaterial.task)
   public taskToMaterials: TaskToMaterial[];
+
+  @OneToMany(() => ReadyProduct, (readyProduct) => readyProduct.task)
+  readyProducts: ReadyProduct[];
 }
