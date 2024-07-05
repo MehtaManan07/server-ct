@@ -2,6 +2,7 @@ import { TaskToMaterial } from 'src/api/task-materials/entities/task-materials.e
 import { BaseEntity } from 'src/db/base.entity';
 import { Column, Entity, ManyToOne, OneToMany, Unique } from 'typeorm';
 import { Category } from './category.entity';
+import { PurchaseRecord } from './raw-material-purchase.entity';
 
 @Entity()
 @Unique(['name', 'size'])
@@ -38,4 +39,10 @@ export class RawMaterial extends BaseEntity {
 
   @OneToMany(() => TaskToMaterial, (tasks) => tasks.rawMaterial)
   public taskToMaterials: TaskToMaterial[];
+
+  @OneToMany(
+    () => PurchaseRecord,
+    (purchaseRecord) => purchaseRecord.rawMaterial,
+  )
+  purchaseRecords: PurchaseRecord[]; // Establish one-to-many relationship with PurchaseRecord
 }

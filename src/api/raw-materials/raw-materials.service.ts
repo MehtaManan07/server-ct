@@ -10,8 +10,9 @@ import {
   ObjectLiteral,
   Repository,
 } from 'typeorm';
-import { Category } from './types';
 import { Category as CategoryEntity } from './entities/category.entity';
+import { PurchaseRecord } from './entities/raw-material-purchase.entity';
+import { CreatePurchaseDTO } from './dto/create-purchase.dto';
 
 @Injectable()
 export class RawMaterialsService {
@@ -19,6 +20,8 @@ export class RawMaterialsService {
     private logger: LoggerService,
     @InjectRepository(CategoryEntity)
     private readonly categoryRepository: Repository<CategoryEntity>,
+    @InjectRepository(PurchaseRecord)
+    private readonly purchaseRecordRepository: Repository<PurchaseRecord>,
     @InjectRepository(RawMaterial)
     private readonly rawMaterialRepository: Repository<RawMaterial>,
   ) {
@@ -118,6 +121,44 @@ export class RawMaterialsService {
     return result.identifiers;
   }
 
+  async createPurchaseRecord(
+    createPurchaseRecordDto: CreatePurchaseDTO,
+  ): Promise<void> {
+    const { rawMaterialId } = createPurchaseRecordDto;
+    const rawMaterial = await this.rawMaterialRepository.findOne({
+      where: { id: rawMaterialId },
+    });
+    if (!rawMaterial) {
+      throw new NotFoundException(
+        `Raw material with ID ${rawMaterialId} not found.`,
+      );
+    }
+    await this.purchaseRecordRepository.save({
+      invoiceNumber: createPurchaseRecordDto.invoiceNumber,
+      notes: createPurchaseRecordDto.notes,
+      purchaseDate: new Date(),
+      quantity: createPurchaseRecordDto.quantity,
+      unitWeight: rawMaterial.weightPerUnit,
+      rawMaterialId,
+      supplier: createPurchaseRecordDto.supplier,
+      totalPrice: createPurchaseRecordDto.totalPrice,
+      unitPrice: createPurchaseRecordDto.unitPrice,
+    });
+    await this.rawMaterialRepository.update(rawMaterialId, {
+      totalWeight:
+        rawMaterial.totalWeight +
+        createPurchaseRecordDto.quantity * rawMaterial.weightPerUnit,
+      packetsAvailable:
+        rawMaterial.packetsAvailable + createPurchaseRecordDto.quantity,
+    });
+    return;
+  }
+
+  async findAllPurchaseRecords(): Promise<PurchaseRecord[]> {
+    const records = await this.purchaseRecordRepository.find();
+    return records;
+  }
+
   async findAll(name: string): Promise<RawMaterial[]> {
     const queryName = name.toLocaleLowerCase();
     const materials = await this.rawMaterialRepository.find({
@@ -168,26 +209,6 @@ export class RawMaterialsService {
   async hardRemove(id: number) {
     await this.rawMaterialRepository.delete(id);
     return;
-  }
-
-  async fetchCategories() {
-    const query = `
-    SELECT categories, json_agg(json_build_object(
-      'materialId', id,
-      'name', name, 
-      'packetsAvailable', "packetsAvailable", 
-      'unit', unit, 
-      'slug', slug, 
-      'color', color, 
-      'size', size, 
-      'weightPerUnit', "weightPerUnit", 
-      'totalWeight', "totalWeight"
-    )) AS materials
-    FROM raw_material
-    GROUP BY categories;
-  `;
-    const result: Category[] = await this.rawMaterialRepository.query(query);
-    return result.filter((item) => item.categories.length > 1);
   }
 
   async findByCategory(category: string): Promise<RawMaterial[]> {

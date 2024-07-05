@@ -8,12 +8,12 @@ export class Task extends BaseEntity {
   @Column()
   jobberId: number;
 
-  @Column()
-  type: string;
-
   @ManyToOne(() => User)
   @JoinColumn({ name: 'jobberId' })
   jobber: User;
+
+  @Column()
+  type: string;
 
   @OneToMany(() => TaskToMaterial, (taskToMaterial) => taskToMaterial.task)
   public taskToMaterials: TaskToMaterial[];

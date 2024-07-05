@@ -16,6 +16,7 @@ import {
 } from './dto/create-raw-material.dto';
 
 import { RawMaterialsService } from './raw-materials.service';
+import { CreatePurchaseDTO } from './dto/create-purchase.dto';
 
 @Controller('raw-materials')
 @ApiTags('Raw materials')
@@ -32,13 +33,23 @@ export class RawMaterialsController {
     return this.rawMaterialsService.create(createRawMaterialDto);
   }
 
+  @Get('/purchase/records')
+  findAllPurchaseRecords() {
+    return this.rawMaterialsService.findAllPurchaseRecords();
+  }
+
+  @Post('/purchase/record')
+  createPurchase(@Body() createPurchaseDto: CreatePurchaseDTO) {
+    return this.rawMaterialsService.createPurchaseRecord(createPurchaseDto);
+  }
+
   @Post('/bulk')
   createBulk(@Body() createRawMaterialDto: CreateRawMaterialBulkDto) {
     return this.rawMaterialsService.createBulk(createRawMaterialDto.data);
   }
 
   @Get()
-  @ApiQuery({ name: 'name', type: String })
+  @ApiQuery({ name: 'name', type: String, allowEmptyValue: true })
   findAll(@Query() params: { name: string }) {
     return this.rawMaterialsService.findAll(params.name ?? '');
   }
@@ -62,11 +73,6 @@ export class RawMaterialsController {
   @Delete('/hard/:id')
   hardRemove(@Param('id') id: string) {
     return this.rawMaterialsService.hardRemove(+id);
-  }
-
-  @Get('/category/all')
-  fetchCategoryNames() {
-    return this.rawMaterialsService.fetchCategories();
   }
 
   @Get('/category/search')
