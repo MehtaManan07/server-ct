@@ -8,6 +8,7 @@ import { Task } from 'src/api/tasks/entities/task.entity';
 import { TaskToMaterial } from 'src/api/task-materials/entities/task-materials.entity';
 import { Category } from 'src/api/raw-materials/entities/category.entity';
 import { PurchaseRecord } from 'src/api/raw-materials/entities/raw-material-purchase.entity';
+import { ReadyProduct } from 'src/api/ready-products/entities/ready-product.entity';
 
 dotenvConfig({ path: '.env.production' });
 
@@ -18,7 +19,15 @@ export const dbConfig: TypeOrmModuleOptions = {
   password: `${process.env.PG_PASSWORD}`,
   port: parseInt(`${process.env.PG_PORT}`),
   database: `${process.env.PG_DATABASE}`,
-  entities: [RawMaterial, User, Task, TaskToMaterial, Category, PurchaseRecord],
+  entities: [
+    RawMaterial,
+    User,
+    Task,
+    TaskToMaterial,
+    Category,
+    PurchaseRecord,
+    ReadyProduct,
+  ],
   extra: {
     trustServerCertificate: true,
     Encrypt: true,
