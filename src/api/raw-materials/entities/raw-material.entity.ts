@@ -14,10 +14,7 @@ export class RawMaterial extends BaseEntity {
   packetsAvailable: number;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
-  unit: string;
-
-  @Column()
-  size: number;
+  size: string;
 
   @Column('text', { array: true })
   categories: string[];

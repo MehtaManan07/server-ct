@@ -11,9 +11,9 @@ export class CreateRawMaterialDto {
   @IsNotEmpty()
   name: string;
 
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  size: number;
+  size: string;
 
   @IsArray({ always: true })
   @IsNotEmpty()
@@ -22,10 +22,6 @@ export class CreateRawMaterialDto {
   @IsString()
   @IsNotEmpty()
   color: string;
-
-  @IsString()
-  @IsNotEmpty()
-  unit: string;
 
   @IsNumber()
   @IsNotEmpty()
