@@ -28,12 +28,14 @@ export class RawMaterialsService {
     this.logger.setContext(RawMaterialsService.name);
   }
 
-  async createParentCategory(name: string): Promise<void> {
-    await this.categoryRepository.save({ name });
-    return;
+  async createParentCategory(name: string): Promise<CategoryEntity> {
+    const category = await this.categoryRepository.save({ name });
+    return category;
   }
 
-  async create(createRawMaterialDto: CreateRawMaterialDto): Promise<void> {
+  async create(
+    createRawMaterialDto: CreateRawMaterialDto,
+  ): Promise<RawMaterial> {
     const {
       categories,
       name,
@@ -53,7 +55,7 @@ export class RawMaterialsService {
     });
 
     const slug = `${name}-${size}`;
-    await this.rawMaterialRepository.save({
+    const material = await this.rawMaterialRepository.save({
       totalWeight,
       color,
       slug,
@@ -64,7 +66,7 @@ export class RawMaterialsService {
       weightPerUnit,
       parentCategory: category,
     });
-    return;
+    return material;
   }
 
   async createBulk(
